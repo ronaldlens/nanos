@@ -17,7 +17,7 @@ puts:
     push ax
     push bx
 
-.loop
+.loop:
     lodsb               ; loads next char in al
     or al, al           ; check if it's 0
     jz .done
@@ -51,7 +51,7 @@ main:
 
     hlt
 
-.halt
+.halt:
     jmp .halt
 
 msg_hello: db 'Hello, world!', ENDL, 0

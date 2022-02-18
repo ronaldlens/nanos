@@ -4,15 +4,47 @@ QEMU=qemu-system-i386
 SRC_DIR=src
 BUILD_DIR=build
 
-run: $(BUILD_DIR)/main_floppy.img
-	$(QEMU) -fda $(BUILD_DIR)/main_floppy.img
+.PHONY: all floppy_image kernel bootloader clean always
 
-$(BUILD_DIR)/main_floppy.img: $(BUILD_DIR)/main.bin
-	cp $(BUILD_DIR)/main.bin $(BUILD_DIR)/main_floppy.img
+run: $(BUILD_DIR)/main_floppy.img
+	$(QEMU) -drive format=raw,file=$(BUILD_DIR)/main_floppy.img 
+
+#
+# floppy image
+#
+floppy_image: $(BUILD_DIR)/main_floppy.img
+
+$(BUILD_DIR)/main_floppy.img: bootloader kernel
+	cp $(BUILD_DIR)/kernel.bin $(BUILD_DIR)/main_floppy.img
 	truncate -s 1440k $(BUILD_DIR)/main_floppy.img
 
+#
+# bootloader
+#
+bootloader: $(BUILD_DIR)/bootloader.bin
 
-$(BUILD_DIR)/main.bin: $(SRC_DIR)/main.asm
-	$(ASM) $(SRC_DIR)/main.asm -f bin -o $(BUILD_DIR)/main.bin
+$(BUILD_DIR)/bootloader.bin: always
+	$(ASM) $(SRC_DIR)/bootloader/boot.asm -f bin -o $(BUILD_DIR)/bootloader.bin
+
+#
+# kernel
+#
+kernel: $(BUILD_DIR)/kernel.bin
+
+$(BUILD_DIR)/kernel.bin: always
+	$(ASM) $(SRC_DIR)/kernel/main.asm -f bin -o $(BUILD_DIR)/kernel.bin
+
+#
+# always
+#
+always:
+	mkdir -p $(BUILD_DIR)
+
+#
+# clean
+#
+clean:
+	rm -rf $(BUILD_DIR)/*
+
 
 
