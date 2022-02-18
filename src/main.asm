@@ -8,6 +8,7 @@ start:
 
 ;
 ; print string to screen
+; params
 ;   - ds:si points to string
 ;
 puts:
@@ -41,7 +42,7 @@ main:
 
     ; setup stack
     mov ss, ax
-    mov sp, 0x7c00
+    mov sp, 0x7c00      ; stack grows downwords
 
     ; prints message
     mov si, msg_hello
